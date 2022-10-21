@@ -10,13 +10,9 @@ from modules import sd_hijack, shared, devices
 from modules.hypernetworks import hypernetwork
 
 
-def create_hypernetwork(name, enable_sizes, overwrite_old, layer_structure=None, add_layer_norm=False, activation_func=None):
-    # Remove illegal characters from name.
-    name = "".join( x for x in name if (x.isalnum() or x in "._- "))
-
+def create_hypernetwork(name, enable_sizes, layer_structure=None, add_layer_norm=False):
     fn = os.path.join(shared.cmd_opts.hypernetwork_dir, f"{name}.pt")
-    if not overwrite_old:
-        assert not os.path.exists(fn), f"file {fn} already exists"
+    assert not os.path.exists(fn), f"file {fn} already exists"
 
     if type(layer_structure) == str:
         layer_structure = [float(x.strip()) for x in layer_structure.split(",")]
@@ -26,7 +22,6 @@ def create_hypernetwork(name, enable_sizes, overwrite_old, layer_structure=None,
         enable_sizes=[int(x) for x in enable_sizes],
         layer_structure=layer_structure,
         add_layer_norm=add_layer_norm,
-        activation_func=activation_func,
     )
     hypernet.save(fn)
 

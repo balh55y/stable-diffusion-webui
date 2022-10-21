@@ -153,7 +153,7 @@ class EmbeddingDatabase:
         return None, None
 
 
-def create_embedding(name, num_vectors_per_token, overwrite_old, init_text='*'):
+def create_embedding(name, num_vectors_per_token, init_text='*'):
     cond_model = shared.sd_model.cond_stage_model
     embedding_layer = cond_model.wrapped.transformer.text_model.embeddings
 
@@ -165,8 +165,7 @@ def create_embedding(name, num_vectors_per_token, overwrite_old, init_text='*'):
         vec[i] = embedded[i * int(embedded.shape[0]) // num_vectors_per_token]
 
     fn = os.path.join(shared.cmd_opts.embeddings_dir, f"{name}.pt")
-    if not overwrite_old:
-        assert not os.path.exists(fn), f"file {fn} already exists"
+    assert not os.path.exists(fn), f"file {fn} already exists"
 
     embedding = Embedding(vec, name)
     embedding.step = 0
@@ -275,7 +274,6 @@ def train_embedding(embedding_name, learn_rate, batch_size, data_root, log_direc
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
 
         epoch_num = embedding.step // len(ds)
         epoch_step = embedding.step - (epoch_num * len(ds)) + 1
